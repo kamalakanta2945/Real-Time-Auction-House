@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  db:
+    image: public.ecr.aws/docker/library/postgres:15-alpine
+    environment:
+      POSTGRES_USER: auction_user
+      POSTGRES_PASSWORD: auction_password
+      POSTGRES_DB: auction_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+volumes:
+  postgres_data:
