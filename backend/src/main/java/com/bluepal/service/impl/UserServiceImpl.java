@@ -19,6 +19,19 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
+    public User register(String username, String password) {
+        if (userRepository.findByUsername(username).isPresent()) {
+            throw new RuntimeException("Username already exists");
+        }
+
+        String hashedPassword = hashPassword(password);
+        String role = userRepository.count() == 0 ? "ADMIN" : "USER";
+
+        User newUser = new User(null, username, hashedPassword, role);
+        return userRepository.save(newUser);
+    }
+
+    @Override
     public User authenticate(String username, String password) {
         String hashedPassword = hashPassword(password);
         Optional<User> userOptional = userRepository.findByUsername(username);
@@ -30,9 +43,7 @@ public class UserServiceImpl implements UserService {
             }
             throw new RuntimeException("Invalid password");
         } else {
-            String role = userRepository.count() == 0 ? "ADMIN" : "USER";
-            User newUser = new User(null, username, hashedPassword, role);
-            return userRepository.save(newUser);
+            throw new RuntimeException("User not found. Please register first.");
         }
     }
 

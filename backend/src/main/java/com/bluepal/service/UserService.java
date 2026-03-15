@@ -4,4 +4,5 @@ import com.bluepal.model.User;
 
 public interface UserService {
     User authenticate(String username, String password);
+    User register(String username, String password);
 }
