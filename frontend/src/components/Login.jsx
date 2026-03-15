@@ -12,10 +12,10 @@ function Login() {
     e.preventDefault();
     try {
       const response = await axios.post('/api/auth/login', { username, password });
-      localStorage.setItem('user', JSON.stringify(response.data));
+      localStorage.setItem('user', JSON.stringify(response.data.data));
       navigate('/');
     } catch (err) {
-      setError(err.response?.data || 'Failed to login');
+      setError(err.response?.data?.message || 'Failed to login');
     }
   };
 

@@ -28,7 +28,12 @@ function CreateAuction() {
       });
       navigate('/');
     } catch (err) {
-      setError(err.response?.data || 'Failed to create auction');
+      if (err.response?.data?.data && typeof err.response.data.data === 'object') {
+        const validationErrors = Object.entries(err.response.data.data).map(([field, msg]) => `${field}: ${msg}`).join(', ');
+        setError(validationErrors);
+      } else {
+        setError(err.response?.data?.message || 'Failed to create auction');
+      }
     }
   };
 

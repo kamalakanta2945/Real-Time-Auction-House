@@ -22,8 +22,8 @@ function AuctionRoom() {
           axios.get(`/api/auctions/${id}`),
           axios.get(`/api/auctions/${id}/bids`)
         ]);
-        setAuction(auctionRes.data);
-        setBids(bidsRes.data);
+        setAuction(auctionRes.data.data);
+        setBids(bidsRes.data.data);
         setLoading(false);
       } catch (error) {
         console.error("Failed to fetch auction details:", error);
@@ -80,9 +80,16 @@ function AuctionRoom() {
       setBidAmount('');
       setNotification({ type: 'success', message: '✅ Your bid was accepted' });
     } catch (error) {
+      let errMsg = 'Failed to place bid';
+      if (error.response?.data?.data && typeof error.response.data.data === 'object') {
+        errMsg = Object.values(error.response.data.data).join(', ');
+      } else if (error.response?.data?.message) {
+        errMsg = error.response.data.message;
+      }
+
       setNotification({
         type: 'error',
-        message: error.response?.data || '❌ Failed to place bid'
+        message: `❌ ${errMsg}`
       });
     }
 

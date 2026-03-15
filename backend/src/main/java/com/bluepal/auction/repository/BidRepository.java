@@ -1,6 +1,6 @@
-package com.auction.repository;
+package com.bluepal.auction.repository;
 
-import com.auction.model.Bid;
+import com.bluepal.auction.model.Bid;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

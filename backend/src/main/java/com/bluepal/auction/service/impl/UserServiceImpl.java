@@ -1,22 +1,24 @@
-package com.auction.service;
+package com.bluepal.auction.service.impl;
 
-import com.auction.model.User;
-import com.auction.repository.UserRepository;
+import com.bluepal.auction.model.User;
+import com.bluepal.auction.repository.UserRepository;
+import com.bluepal.auction.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
+    @Override
     public User authenticate(String username, String password) {
         String hashedPassword = hashPassword(password);
         Optional<User> userOptional = userRepository.findByUsername(username);
@@ -28,7 +30,6 @@ public class UserService {
             }
             throw new RuntimeException("Invalid password");
         } else {
-            // First user becomes an admin for demonstration purposes
             String role = userRepository.count() == 0 ? "ADMIN" : "USER";
             User newUser = new User(null, username, hashedPassword, role);
             return userRepository.save(newUser);

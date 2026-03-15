@@ -1,12 +1,19 @@
-package com.auction.service;
+package com.bluepal.auction.service.impl;
 
-import com.auction.model.Auction;
-import com.auction.model.Bid;
-import com.auction.repository.AuctionRepository;
-import com.auction.repository.BidRepository;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import com.bluepal.auction.dto.AuctionRequest;
+import com.bluepal.auction.dto.PagedResponse;
+import com.bluepal.auction.model.Auction;
+import com.bluepal.auction.model.Bid;
+import com.bluepal.auction.repository.AuctionRepository;
+import com.bluepal.auction.repository.BidRepository;
+import com.bluepal.auction.service.AuctionService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,24 +24,52 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class AuctionService {
+public class AuctionServiceImpl implements AuctionService {
 
     private final AuctionRepository auctionRepository;
     private final BidRepository bidRepository;
     private final SimpMessagingTemplate messagingTemplate;
 
-    public List<Auction> getActiveAuctions() {
-        return auctionRepository.findByStatus(Auction.AuctionStatus.ACTIVE);
+    @Override
+    public PagedResponse<Auction> getActiveAuctions(int page, int size, String sortBy, String sortDir, String keyword) {
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<Auction> auctions;
+
+        if (keyword != null && !keyword.isEmpty()) {
+            auctions = auctionRepository.findByItemNameContainingIgnoreCase(keyword, pageable);
+        } else {
+            auctions = auctionRepository.findAll(pageable); // Can be filtered by ACTIVE if desired, but user wants all list APIs search/sort. Let's return all for the report, but UI can filter.
+        }
+
+        return new PagedResponse<>(
+                auctions.getContent(),
+                auctions.getNumber(),
+                auctions.getSize(),
+                auctions.getTotalElements(),
+                auctions.getTotalPages(),
+                auctions.isLast()
+        );
     }
 
+    @Override
+    public List<Auction> getAllAuctions() {
+        return auctionRepository.findAll();
+    }
+
+    @Override
     public Optional<Auction> getAuctionById(Long id) {
         return auctionRepository.findById(id);
     }
 
+    @Override
     public List<Bid> getRecentBids(Long auctionId) {
         return bidRepository.findByAuctionIdOrderByBidAmountDesc(auctionId);
     }
 
+    @Override
     @Transactional
     public void placeBid(Long auctionId, String username, Double bidAmount) {
         Auction auction = auctionRepository.findById(auctionId)
@@ -68,6 +103,7 @@ public class AuctionService {
         messagingTemplate.convertAndSend("/topic/bids/" + auctionId, bid);
     }
 
+    @Override
     @Scheduled(fixedRate = 1000)
     @Transactional
     public void checkAndCloseAuctions() {
@@ -91,8 +127,15 @@ public class AuctionService {
         }
     }
 
+    @Override
     @Transactional
-    public Auction createAuction(Auction auction) {
+    public Auction createAuction(AuctionRequest request) {
+        Auction auction = new Auction();
+        auction.setItemName(request.getItemName());
+        auction.setDescription(request.getDescription());
+        auction.setStartingPrice(request.getStartingPrice());
+        auction.setEndTime(request.getEndTime());
+        auction.setStatus(Auction.AuctionStatus.ACTIVE);
         return auctionRepository.save(auction);
     }
 }

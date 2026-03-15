@@ -1,26 +1,33 @@
-package com.auction.model;
+package com.bluepal.auction.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
-@Table(name = "users")
+@Table(name = "bids")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class Bid {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
+    private Long auctionId;
+
+    @Column(nullable = false)
     private String username;
 
     @Column(nullable = false)
-    private String password;
+    private Double bidAmount;
 
-    private String role;
+    @Column(nullable = false)
+    private LocalDateTime bidTime;
+
 }

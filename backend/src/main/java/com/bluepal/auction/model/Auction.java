@@ -1,4 +1,4 @@
-package com.auction.model;
+package com.bluepal.auction.model;
 
 import jakarta.persistence.*;
 import lombok.Data;

@@ -1,6 +1,6 @@
-package com.auction.repository;
+package com.bluepal.auction.repository;
 
-import com.auction.model.User;
+import com.bluepal.auction.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
