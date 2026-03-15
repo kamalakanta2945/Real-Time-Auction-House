@@ -67,6 +67,18 @@ public class AuctionController {
         return ResponseEntity.ok(new ApiResponse<>("success", "Auction created successfully", created));
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<Auction>> updateAuction(@PathVariable Long id, @Valid @RequestBody AuctionRequest request) {
+        Auction updated = auctionService.updateAuction(id, request);
+        return ResponseEntity.ok(new ApiResponse<>("success", "Auction updated successfully", updated));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<String>> deleteAuction(@PathVariable Long id) {
+        auctionService.deleteAuction(id);
+        return ResponseEntity.ok(new ApiResponse<>("success", "Auction deleted successfully", null));
+    }
+
     @GetMapping("/export/excel")
     public ResponseEntity<InputStreamResource> exportExcel() {
         ByteArrayInputStream in = reportService.generateExcelReport();

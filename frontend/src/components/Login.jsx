@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../axiosConfig';
 
 function Login() {
   const [isLogin, setIsLogin] = useState(true);
@@ -16,11 +16,13 @@ function Login() {
     try {
       if (isLogin) {
         const response = await axios.post('/api/auth/login', { username, password });
-        localStorage.setItem('user', JSON.stringify(response.data.data));
+        const { token, user } = response.data.data;
+        localStorage.setItem('user', JSON.stringify({ token, ...user }));
         navigate('/');
       } else {
         const response = await axios.post('/api/auth/register', { username, password });
-        localStorage.setItem('user', JSON.stringify(response.data.data));
+        const { token, user } = response.data.data;
+        localStorage.setItem('user', JSON.stringify({ token, ...user }));
         navigate('/');
       }
     } catch (err) {

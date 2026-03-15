@@ -4,12 +4,9 @@ import com.bluepal.model.User;
 import com.bluepal.repository.UserRepository;
 import com.bluepal.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
 import java.util.Optional;
 
 @Service
@@ -17,6 +14,7 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public User register(String username, String password) {
@@ -24,7 +22,7 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("Username already exists");
         }
 
-        String hashedPassword = hashPassword(password);
+        String hashedPassword = passwordEncoder.encode(password);
         String role = userRepository.count() == 0 ? "ADMIN" : "USER";
 
         User newUser = new User(null, username, hashedPassword, role);
@@ -33,27 +31,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User authenticate(String username, String password) {
-        String hashedPassword = hashPassword(password);
         Optional<User> userOptional = userRepository.findByUsername(username);
 
         if (userOptional.isPresent()) {
             User user = userOptional.get();
-            if (user.getPassword().equals(hashedPassword)) {
+            if (passwordEncoder.matches(password, user.getPassword())) {
                 return user;
             }
             throw new RuntimeException("Invalid password");
         } else {
             throw new RuntimeException("User not found. Please register first.");
-        }
-    }
-
-    private String hashPassword(String password) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(password.getBytes(StandardCharsets.UTF_8));
-            return Base64.getEncoder().encodeToString(hash);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("Error hashing password", e);
         }
     }
 }

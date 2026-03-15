@@ -15,6 +15,8 @@ public interface AuctionService {
     List<Bid> getRecentBids(Long auctionId);
     void placeBid(Long auctionId, String username, Double bidAmount);
     Auction createAuction(AuctionRequest request);
+    Auction updateAuction(Long id, AuctionRequest request);
+    void deleteAuction(Long id);
     void checkAndCloseAuctions();
     List<Auction> getAllAuctions();
 }

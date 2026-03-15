@@ -138,4 +138,31 @@ public class AuctionServiceImpl implements AuctionService {
         auction.setStatus(Auction.AuctionStatus.ACTIVE);
         return auctionRepository.save(auction);
     }
+
+    @Override
+    @Transactional
+    public Auction updateAuction(Long id, AuctionRequest request) {
+        Auction auction = auctionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Auction not found"));
+
+        if (auction.getStatus() == Auction.AuctionStatus.CLOSED) {
+            throw new RuntimeException("Cannot update a closed auction");
+        }
+
+        auction.setItemName(request.getItemName());
+        auction.setDescription(request.getDescription());
+        auction.setStartingPrice(request.getStartingPrice());
+        auction.setEndTime(request.getEndTime());
+        return auctionRepository.save(auction);
+    }
+
+    @Override
+    @Transactional
+    public void deleteAuction(Long id) {
+        if (!auctionRepository.existsById(id)) {
+            throw new RuntimeException("Auction not found");
+        }
+        bidRepository.deleteAll(bidRepository.findByAuctionIdOrderByBidAmountDesc(id));
+        auctionRepository.deleteById(id);
+    }
 }

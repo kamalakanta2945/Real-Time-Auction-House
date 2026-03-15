@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../axiosConfig';
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { useCountdown } from '../hooks/useCountdown';
