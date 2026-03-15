@@ -28,9 +28,9 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<AuthResponse>> register(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<ApiResponse<User>> register(@Valid @RequestBody RegisterRequest request) {
         User user = userService.register(request.getUsername(), request.getPassword());
-        String token = jwtUtil.generateToken(user);
-        return ResponseEntity.ok(new ApiResponse<>("success", "User registered successfully", new AuthResponse(token, user)));
+        // Do not generate or return a token on registration; user must explicitly log in.
+        return ResponseEntity.ok(new ApiResponse<>("success", "User registered successfully. Please login.", user));
     }
 }

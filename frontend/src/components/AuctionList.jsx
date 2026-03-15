@@ -68,22 +68,26 @@ function AuctionList() {
   if (loading && auctions.length === 0) return <div className="text-center mt-10">Loading active auctions...</div>;
   if (error) return <div className="text-center mt-10 text-red-500">{error}</div>;
 
+  const user = JSON.parse(localStorage.getItem('user'));
+
   return (
-    <div className="max-w-5xl mx-auto mt-10">
-      <div className="flex flex-col md:flex-row justify-between items-center mb-6">
-        <h2 className="text-3xl font-bold mb-4 md:mb-0">Active Auctions</h2>
-        <div className="flex space-x-2">
-          <button onClick={() => downloadReport('excel')} className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm">
-            Export Excel
-          </button>
-          <button onClick={() => downloadReport('pdf')} className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm">
-            Export PDF
-          </button>
-          <label className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm cursor-pointer">
-            Import Excel
-            <input type="file" accept=".xlsx" className="hidden" onChange={handleFileUpload} />
-          </label>
-        </div>
+    <div className="max-w-6xl mx-auto mt-8">
+      <div className="flex flex-col md:flex-row justify-between items-center mb-8 border-b pb-4 border-gray-200">
+        <h2 className="text-4xl font-extrabold text-gray-800 tracking-tight">Active Auctions</h2>
+        {user?.role === 'ADMIN' && (
+          <div className="flex space-x-3 mt-4 md:mt-0">
+            <button onClick={() => downloadReport('excel')} className="bg-emerald-100 text-emerald-800 hover:bg-emerald-200 font-semibold px-4 py-2 rounded-lg text-sm shadow-sm transition">
+              ⬇ Export Excel
+            </button>
+            <button onClick={() => downloadReport('pdf')} className="bg-rose-100 text-rose-800 hover:bg-rose-200 font-semibold px-4 py-2 rounded-lg text-sm shadow-sm transition">
+              ⬇ Export PDF
+            </button>
+            <label className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-lg text-sm cursor-pointer shadow-md transition transform hover:-translate-y-0.5">
+              ⬆ Import Excel
+              <input type="file" accept=".xlsx" className="hidden" onChange={handleFileUpload} />
+            </label>
+          </div>
+        )}
       </div>
 
       {importMessage && (
@@ -93,27 +97,30 @@ function AuctionList() {
       )}
 
       {/* Filters */}
-      <div className="bg-white p-4 rounded shadow mb-6 flex flex-wrap gap-4 items-center">
-        <form onSubmit={handleSearch} className="flex flex-grow max-w-sm">
+      <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 mb-8 flex flex-wrap gap-6 items-center justify-between">
+        <form onSubmit={handleSearch} className="flex flex-grow max-w-md relative">
           <input
             type="text"
             placeholder="Search item name..."
-            className="border p-2 rounded-l w-full focus:outline-none focus:ring focus:border-blue-300"
+            className="w-full pl-4 pr-24 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition shadow-sm"
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
           />
-          <button type="submit" className="bg-gray-800 text-white px-4 rounded-r hover:bg-gray-700">Search</button>
+          <button type="submit" className="absolute right-1 top-1 bottom-1 bg-indigo-600 text-white font-semibold px-6 rounded-full hover:bg-indigo-700 transition">
+            Search
+          </button>
         </form>
 
-        <div className="flex items-center space-x-2 ml-auto">
-          <label className="text-gray-600 text-sm">Sort by:</label>
-          <select value={sortBy} onChange={(e) => { setSortBy(e.target.value); setPage(0); }} className="border rounded p-1 text-sm">
-            <option value="id">ID</option>
-            <option value="itemName">Name</option>
+        <div className="flex items-center space-x-4 bg-gray-50 p-2 rounded-xl border border-gray-200">
+          <label className="text-gray-500 text-sm font-semibold uppercase tracking-wider pl-2">Sort</label>
+          <select value={sortBy} onChange={(e) => { setSortBy(e.target.value); setPage(0); }} className="bg-transparent border-none text-gray-700 font-medium focus:ring-0 cursor-pointer">
+            <option value="id">Recent</option>
+            <option value="itemName">Name A-Z</option>
             <option value="startingPrice">Price</option>
-            <option value="endTime">End Time</option>
+            <option value="endTime">Closing Soon</option>
           </select>
-          <select value={sortDir} onChange={(e) => { setSortDir(e.target.value); setPage(0); }} className="border rounded p-1 text-sm">
+          <div className="w-px h-5 bg-gray-300"></div>
+          <select value={sortDir} onChange={(e) => { setSortDir(e.target.value); setPage(0); }} className="bg-transparent border-none text-gray-700 font-medium focus:ring-0 cursor-pointer pr-2">
             <option value="asc">Ascending</option>
             <option value="desc">Descending</option>
           </select>
@@ -123,41 +130,44 @@ function AuctionList() {
       {auctions.length === 0 ? (
         <p className="text-gray-600">No auctions found.</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {auctions.map(auction => (
-            <div key={auction.id} className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-semibold">{auction.itemName}</h3>
-                {auction.status === 'ACTIVE' ? (
-                  <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full flex items-center">
-                    <span className="w-2 h-2 mr-1 bg-green-500 rounded-full"></span> ACTIVE
-                  </span>
-                ) : (
-                  <span className="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full flex items-center">
-                    CLOSED
-                  </span>
-                )}
-              </div>
-              <p className="text-gray-600 mb-4">{auction.description}</p>
-              <div className="flex justify-between items-center mb-4">
-                <div className="text-sm">
-                  <span className="text-gray-500 block">Current Highest Bid</span>
-                  <span className="text-lg font-bold text-green-600">
-                    ${auction.currentHighestBid || auction.startingPrice}
-                  </span>
+            <div key={auction.id} className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-2xl transition duration-300 transform hover:-translate-y-1 flex flex-col">
+              <div className="p-6 flex-grow">
+                <div className="flex justify-between items-start mb-4">
+                  <h3 className="text-2xl font-bold text-gray-900 line-clamp-1" title={auction.itemName}>{auction.itemName}</h3>
+                  {auction.status === 'ACTIVE' ? (
+                    <span className="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full flex items-center shadow-sm whitespace-nowrap">
+                      <span className="w-2 h-2 mr-1.5 bg-emerald-500 rounded-full animate-pulse"></span> ACTIVE
+                    </span>
+                  ) : (
+                    <span className="bg-rose-100 text-rose-800 text-xs font-bold px-3 py-1 rounded-full shadow-sm whitespace-nowrap">
+                      CLOSED
+                    </span>
+                  )}
                 </div>
-                <div className="text-sm text-right">
-                  <span className="text-gray-500 block">Ends At</span>
-                  <span className="font-medium text-gray-800">
-                    {new Date(auction.endTime).toLocaleString()}
-                  </span>
+                <p className="text-gray-500 text-sm mb-6 line-clamp-2 leading-relaxed">{auction.description}</p>
+
+                <div className="flex justify-between items-end bg-gray-50 p-4 rounded-xl mb-2">
+                  <div>
+                    <span className="text-gray-400 text-xs font-semibold uppercase tracking-wider block mb-1">Highest Bid</span>
+                    <span className="text-3xl font-extrabold text-indigo-600">
+                      ${auction.currentHighestBid || auction.startingPrice}
+                    </span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-gray-400 text-xs font-semibold uppercase tracking-wider block mb-1">Ends At</span>
+                    <span className="font-semibold text-gray-700 text-sm">
+                      {new Date(auction.endTime).toLocaleDateString()} <br/> {new Date(auction.endTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                    </span>
+                  </div>
                 </div>
               </div>
               <Link
                 to={`/auction/${auction.id}`}
-                className="block text-center w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded transition duration-200"
+                className="bg-gray-900 hover:bg-indigo-600 text-white text-center font-bold py-4 transition-colors duration-300 w-full"
               >
-                Enter Auction Room
+                {auction.status === 'ACTIVE' ? 'Place Bid' : 'View Results'} →
               </Link>
             </div>
           ))}
@@ -166,21 +176,21 @@ function AuctionList() {
 
       {/* Pagination Controls */}
       {totalPages > 1 && (
-        <div className="mt-8 flex justify-center space-x-2">
+        <div className="mt-12 mb-8 flex justify-center items-center space-x-4 bg-white p-3 rounded-full shadow-sm border border-gray-100 w-fit mx-auto">
           <button
             disabled={page === 0}
             onClick={() => setPage(p => p - 1)}
-            className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+            className="px-5 py-2 bg-indigo-50 text-indigo-600 font-bold rounded-full hover:bg-indigo-100 disabled:opacity-50 disabled:cursor-not-allowed transition"
           >
-            Prev
+            ← Prev
           </button>
-          <span className="px-4 py-1">Page {page + 1} of {totalPages}</span>
+          <span className="px-4 font-bold text-gray-700">Page {page + 1} of {totalPages}</span>
           <button
             disabled={page >= totalPages - 1}
             onClick={() => setPage(p => p + 1)}
-            className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+            className="px-5 py-2 bg-indigo-50 text-indigo-600 font-bold rounded-full hover:bg-indigo-100 disabled:opacity-50 disabled:cursor-not-allowed transition"
           >
-            Next
+            Next →
           </button>
         </div>
       )}

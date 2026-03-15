@@ -100,34 +100,34 @@ function AuctionRoom() {
   if (!auction) return <div className="text-center mt-10 text-red-500">Auction not found.</div>;
 
   return (
-    <div className="max-w-4xl mx-auto mt-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div className="max-w-6xl mx-auto mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
 
       {/* Left Column: Auction Info & Bidding Form */}
-      <div className="md:col-span-2 space-y-6">
-        <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-3xl font-bold">{auction.itemName}</h2>
+      <div className="lg:col-span-2 space-y-8">
+        <div className="bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
+          <div className="flex justify-between items-start mb-6">
+            <h2 className="text-4xl font-extrabold text-gray-900 tracking-tight leading-tight">{auction.itemName}</h2>
             {auction.status === 'ACTIVE' ? (
-              <span className="bg-green-100 text-green-800 text-sm font-medium px-2.5 py-0.5 rounded-full flex items-center">
-                <span className="w-2 h-2 mr-1 bg-green-500 rounded-full animate-pulse"></span> 🟢 ACTIVE
+              <span className="bg-emerald-100 text-emerald-800 text-sm font-bold px-4 py-1.5 rounded-full flex items-center shadow-sm">
+                <span className="w-2 h-2 mr-2 bg-emerald-500 rounded-full animate-pulse"></span> ACTIVE
               </span>
             ) : (
-              <span className="bg-red-100 text-red-800 text-sm font-medium px-2.5 py-0.5 rounded-full flex items-center">
-                🔴 CLOSED
+              <span className="bg-rose-100 text-rose-800 text-sm font-bold px-4 py-1.5 rounded-full flex items-center shadow-sm">
+                CLOSED
               </span>
             )}
           </div>
 
-          <p className="text-gray-600 mb-6">{auction.description}</p>
+          <p className="text-gray-600 mb-8 text-lg leading-relaxed">{auction.description}</p>
 
-          <div className="flex flex-col md:flex-row justify-between items-center bg-gray-50 p-4 rounded-lg border border-gray-100 mb-6">
-            <div className="text-center mb-4 md:mb-0">
-              <span className="text-sm text-gray-500 block">Starting Price</span>
-              <span className="text-xl font-semibold">${auction.startingPrice}</span>
+          <div className="flex flex-col sm:flex-row justify-between items-center bg-gradient-to-r from-gray-50 to-gray-100 p-6 rounded-2xl border border-gray-200 mb-8">
+            <div className="text-center sm:text-left mb-6 sm:mb-0">
+              <span className="text-sm font-bold text-gray-400 uppercase tracking-wider block mb-1">Starting Price</span>
+              <span className="text-2xl font-bold text-gray-700">${auction.startingPrice}</span>
             </div>
-            <div className="text-center">
-              <span className="text-sm text-gray-500 block">Highest Bid</span>
-              <span className="text-3xl font-bold text-green-600">
+            <div className="text-center sm:text-right">
+              <span className="text-sm font-bold text-indigo-400 uppercase tracking-wider block mb-1">Highest Bid</span>
+              <span className="text-5xl font-black text-indigo-600">
                 ${auction.currentHighestBid || auction.startingPrice}
               </span>
             </div>
@@ -137,19 +137,19 @@ function AuctionRoom() {
 
           {/* Bidding Form */}
           {auction.status === 'ACTIVE' && (
-            <div className="mt-6 border-t pt-6">
-              <h3 className="text-xl font-semibold mb-4">Place a Bid</h3>
-              <form onSubmit={handleBidSubmit} className="flex gap-4 items-center">
+            <div className="mt-10 border-t border-gray-100 pt-8">
+              <h3 className="text-2xl font-bold mb-6 text-gray-800 tracking-tight">Place your Bid</h3>
+              <form onSubmit={handleBidSubmit} className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
                 <div className="relative flex-grow">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <span className="text-gray-500 sm:text-sm">$</span>
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <span className="text-gray-500 font-bold text-xl">$</span>
                   </div>
                   <input
                     type="number"
                     step="0.01"
                     min={(auction.currentHighestBid || auction.startingPrice) + 0.01}
-                    className="pl-7 block w-full rounded-md border-gray-300 border p-3 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-lg"
-                    placeholder="Enter bid amount"
+                    className="pl-10 block w-full rounded-xl border-gray-300 border-2 p-4 shadow-sm focus:ring-4 focus:ring-indigo-500 focus:border-indigo-500 text-xl font-bold text-gray-800 transition"
+                    placeholder="Enter amount"
                     value={bidAmount}
                     onChange={(e) => setBidAmount(e.target.value)}
                     required
@@ -157,14 +157,14 @@ function AuctionRoom() {
                 </div>
                 <button
                   type="submit"
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded shadow"
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold py-4 px-8 rounded-xl shadow-lg transition transform hover:-translate-y-1 sm:w-auto w-full text-lg whitespace-nowrap"
                 >
-                  Bid Now
+                  Place Bid →
                 </button>
               </form>
 
               {notification && (
-                <div className={`mt-4 p-3 rounded text-sm ${notification.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                <div className={`mt-6 p-4 rounded-xl text-sm font-bold shadow-sm ${notification.type === 'success' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'}`}>
                   {notification.message}
                 </div>
               )}
@@ -174,22 +174,32 @@ function AuctionRoom() {
       </div>
 
       {/* Right Column: Bid History */}
-      <div className="md:col-span-1">
-        <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 h-full">
-          <h3 className="text-xl font-semibold mb-4 border-b pb-2">Recent Bids</h3>
+      <div className="lg:col-span-1">
+        <div className="bg-white p-6 rounded-2xl shadow-xl border border-gray-100 h-full flex flex-col max-h-[800px]">
+          <h3 className="text-2xl font-bold mb-6 border-b border-gray-100 pb-4 text-gray-800 tracking-tight flex items-center">
+            <span className="bg-indigo-100 text-indigo-600 w-8 h-8 rounded-full flex justify-center items-center mr-3 text-sm">#</span>
+            Recent Bids
+          </h3>
           {bids.length === 0 ? (
-            <p className="text-gray-500 text-center py-4">No bids placed yet.</p>
+            <div className="flex-grow flex items-center justify-center">
+              <p className="text-gray-400 text-center font-medium italic">Be the first to bid!</p>
+            </div>
           ) : (
-            <div className="space-y-3 max-h-96 overflow-y-auto">
+            <div className="space-y-3 overflow-y-auto flex-grow pr-2 custom-scrollbar">
               {bids.map((bid, index) => (
-                <div key={bid.id} className="flex justify-between items-center p-3 rounded border border-gray-100 bg-gray-50 hover:bg-gray-100 transition">
-                  <div className="flex flex-col">
-                    <span className="font-semibold text-gray-800">{bid.username}</span>
-                    <span className="text-xs text-gray-500">
-                      {new Date(bid.bidTime).toLocaleTimeString()}
-                    </span>
+                <div key={bid.id} className={`flex justify-between items-center p-4 rounded-xl border transition ${index === 0 ? 'border-indigo-200 bg-indigo-50 shadow-md transform scale-[1.02]' : 'border-gray-100 bg-white hover:bg-gray-50'}`}>
+                  <div className="flex items-center">
+                    <div className={`w-10 h-10 rounded-full flex justify-center items-center font-bold mr-3 ${index === 0 ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-600'}`}>
+                      {index === 0 ? '🏆' : bid.username.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="flex flex-col">
+                      <span className={`font-bold ${index === 0 ? 'text-indigo-900' : 'text-gray-800'}`}>{bid.username}</span>
+                      <span className="text-xs text-gray-400 font-medium">
+                        {new Date(bid.bidTime).toLocaleTimeString()}
+                      </span>
+                    </div>
                   </div>
-                  <span className={`font-bold ${index === 0 ? 'text-green-600' : 'text-gray-700'}`}>
+                  <span className={`font-black text-lg ${index === 0 ? 'text-indigo-600' : 'text-gray-600'}`}>
                     ${bid.bidAmount}
                   </span>
                 </div>
@@ -208,45 +218,50 @@ const CountdownTimer = ({ targetDate, isClosed, winner, highestBid }) => {
 
   if (isClosed || isComplete) {
     return (
-      <div className="bg-yellow-50 p-6 rounded-lg border border-yellow-200 text-center">
-        <h3 className="text-xl font-bold text-yellow-800 mb-2">Auction Ended</h3>
+      <div className="bg-gradient-to-r from-amber-50 to-orange-50 p-8 rounded-2xl border border-amber-200 text-center shadow-inner">
+        <h3 className="text-2xl font-black text-amber-800 mb-4 uppercase tracking-widest">Auction Closed</h3>
         {winner && winner !== 'No winner' ? (
-          <div>
-            <p className="text-2xl mb-1">🏆 Winner: <span className="font-bold">{winner}</span></p>
-            <p className="text-lg text-gray-700">Winning Bid: <span className="font-bold text-green-600">${highestBid}</span></p>
+          <div className="bg-white p-6 rounded-xl shadow-sm inline-block">
+            <p className="text-lg text-gray-500 font-bold uppercase tracking-wider mb-2">Winner</p>
+            <p className="text-4xl font-black text-gray-900 mb-4">🏆 {winner}</p>
+            <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">Winning Bid</p>
+            <p className="text-3xl font-black text-emerald-600">${highestBid}</p>
           </div>
         ) : (
-          <p className="text-lg text-gray-700">No winner for this auction.</p>
+          <p className="text-xl font-bold text-gray-600 italic">No bids were placed.</p>
         )}
       </div>
     );
   }
 
   return (
-    <div className="bg-blue-50 p-6 rounded-lg border border-blue-100 flex flex-col items-center">
-      <h3 className="text-gray-600 font-semibold mb-2 flex items-center">
-        <span className="mr-2">⏳</span> Time Left
+    <div className="bg-gray-900 p-8 rounded-2xl shadow-xl flex flex-col items-center relative overflow-hidden">
+      <div className="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 rounded-full bg-indigo-500 opacity-20 blur-2xl"></div>
+      <div className="absolute bottom-0 left-0 -ml-8 -mb-8 w-32 h-32 rounded-full bg-pink-500 opacity-20 blur-2xl"></div>
+
+      <h3 className="text-gray-400 font-bold uppercase tracking-widest mb-6 text-sm relative z-10 flex items-center">
+        <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse mr-2"></span> Time Remaining
       </h3>
-      <div className="flex space-x-4 text-center">
+      <div className="flex space-x-3 sm:space-x-6 text-center relative z-10">
         {days > 0 && (
           <div className="flex flex-col">
-            <span className="text-3xl font-bold text-blue-900 bg-white px-3 py-2 rounded shadow-sm">{String(days).padStart(2, '0')}</span>
-            <span className="text-xs text-blue-600 mt-1 uppercase">Days</span>
+            <span className="text-4xl sm:text-5xl font-black text-white bg-gray-800/80 px-4 py-3 rounded-xl shadow-inner border border-gray-700/50 backdrop-blur-sm">{String(days).padStart(2, '0')}</span>
+            <span className="text-xs text-gray-400 mt-2 font-bold uppercase tracking-wider">Days</span>
           </div>
         )}
         <div className="flex flex-col">
-          <span className="text-3xl font-bold text-blue-900 bg-white px-3 py-2 rounded shadow-sm">{String(hours).padStart(2, '0')}</span>
-          <span className="text-xs text-blue-600 mt-1 uppercase">Hours</span>
+          <span className="text-4xl sm:text-5xl font-black text-white bg-gray-800/80 px-4 py-3 rounded-xl shadow-inner border border-gray-700/50 backdrop-blur-sm">{String(hours).padStart(2, '0')}</span>
+          <span className="text-xs text-gray-400 mt-2 font-bold uppercase tracking-wider">Hours</span>
         </div>
-        <div className="text-2xl font-bold text-blue-900 mt-2">:</div>
+        <div className="text-3xl sm:text-4xl font-black text-gray-600 mt-3">:</div>
         <div className="flex flex-col">
-          <span className="text-3xl font-bold text-blue-900 bg-white px-3 py-2 rounded shadow-sm">{String(minutes).padStart(2, '0')}</span>
-          <span className="text-xs text-blue-600 mt-1 uppercase">Mins</span>
+          <span className="text-4xl sm:text-5xl font-black text-white bg-gray-800/80 px-4 py-3 rounded-xl shadow-inner border border-gray-700/50 backdrop-blur-sm">{String(minutes).padStart(2, '0')}</span>
+          <span className="text-xs text-gray-400 mt-2 font-bold uppercase tracking-wider">Mins</span>
         </div>
-        <div className="text-2xl font-bold text-blue-900 mt-2">:</div>
+        <div className="text-3xl sm:text-4xl font-black text-gray-600 mt-3">:</div>
         <div className="flex flex-col">
-          <span className="text-3xl font-bold text-blue-900 bg-white px-3 py-2 rounded shadow-sm">{String(seconds).padStart(2, '0')}</span>
-          <span className="text-xs text-blue-600 mt-1 uppercase">Secs</span>
+          <span className="text-4xl sm:text-5xl font-black text-pink-400 bg-gray-800/80 px-4 py-3 rounded-xl shadow-inner border border-gray-700/50 backdrop-blur-sm">{String(seconds).padStart(2, '0')}</span>
+          <span className="text-xs text-pink-500/70 mt-2 font-bold uppercase tracking-wider">Secs</span>
         </div>
       </div>
     </div>
