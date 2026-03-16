@@ -31,17 +31,34 @@ public class AuctionServiceImpl implements AuctionService {
     private final SimpMessagingTemplate messagingTemplate;
 
     @Override
-    public PagedResponse<Auction> getActiveAuctions(int page, int size, String sortBy, String sortDir, String keyword) {
+    public PagedResponse<Auction> getAuctions(int page, int size, String sortBy, String sortDir, String keyword, String status) {
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
 
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<Auction> auctions;
 
+        Auction.AuctionStatus auctionStatus = null;
+        if (status != null && !status.isEmpty() && !status.equalsIgnoreCase("ALL")) {
+            try {
+                auctionStatus = Auction.AuctionStatus.valueOf(status.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                // Ignore invalid status
+            }
+        }
+
         if (keyword != null && !keyword.isEmpty()) {
-            auctions = auctionRepository.findByItemNameContainingIgnoreCase(keyword, pageable);
+            if (auctionStatus != null) {
+                auctions = auctionRepository.findByStatusAndItemNameContainingIgnoreCase(auctionStatus, keyword, pageable);
+            } else {
+                auctions = auctionRepository.findByItemNameContainingIgnoreCase(keyword, pageable);
+            }
         } else {
-            auctions = auctionRepository.findAll(pageable); // Can be filtered by ACTIVE if desired, but user wants all list APIs search/sort. Let's return all for the report, but UI can filter.
+            if (auctionStatus != null) {
+                auctions = auctionRepository.findByStatus(auctionStatus, pageable);
+            } else {
+                auctions = auctionRepository.findAll(pageable);
+            }
         }
 
         return new PagedResponse<>(
@@ -52,6 +69,35 @@ public class AuctionServiceImpl implements AuctionService {
                 auctions.getTotalPages(),
                 auctions.isLast()
         );
+    }
+
+    @Override
+    public List<Auction> getAuctionsWonByUser(String username) {
+        return auctionRepository.findByWinner(username);
+    }
+
+    @Override
+    public PagedResponse<Bid> getAllBids(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Bid> bids = bidRepository.findAllByOrderByBidTimeDesc(pageable);
+        return new PagedResponse<>(
+                bids.getContent(),
+                bids.getNumber(),
+                bids.getSize(),
+                bids.getTotalElements(),
+                bids.getTotalPages(),
+                bids.isLast()
+        );
+    }
+
+    @Override
+    public long getTotalBids() {
+        return bidRepository.count();
+    }
+
+    @Override
+    public long getTotalAuctions() {
+        return auctionRepository.count();
     }
 
     @Override

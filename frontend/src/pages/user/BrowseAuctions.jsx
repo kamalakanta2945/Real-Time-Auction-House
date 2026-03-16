@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import axios from '../axiosConfig';
+import axios from '../../axiosConfig';
 import { Link } from 'react-router-dom';
 
-function AuctionList() {
+function BrowseAuctions({ status = 'ALL' }) {
   const [auctions, setAuctions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -21,7 +21,7 @@ function AuctionList() {
     setLoading(true);
     try {
       const response = await axios.get('/api/auctions', {
-        params: { page, size, sortBy, sortDir, keyword }
+        params: { page, size, sortBy, sortDir, keyword, status }
       });
       setAuctions(response.data.data.content);
       setTotalPages(response.data.data.totalPages);
@@ -71,9 +71,11 @@ function AuctionList() {
   const user = JSON.parse(localStorage.getItem('user'));
 
   return (
-    <div className="max-w-6xl mx-auto mt-8">
+    <div className="max-w-6xl mx-auto mt-8 animate-fade-in-up">
       <div className="flex flex-col md:flex-row justify-between items-center mb-8 border-b pb-4 border-gray-200">
-        <h2 className="text-4xl font-extrabold text-gray-800 tracking-tight">Active Auctions</h2>
+        <h2 className="text-4xl font-extrabold text-gray-800 tracking-tight">
+          {status === 'ACTIVE' ? 'Active Auctions' : status === 'CLOSED' ? 'Completed Auctions' : 'Browse Auctions'}
+        </h2>
         {user?.role === 'ADMIN' && (
           <div className="flex space-x-3 mt-4 md:mt-0">
             <button onClick={() => downloadReport('excel')} className="bg-emerald-100 text-emerald-800 hover:bg-emerald-200 font-semibold px-4 py-2 rounded-lg text-sm shadow-sm transition">
@@ -198,4 +200,4 @@ function AuctionList() {
   );
 }
 
-export default AuctionList;
+export default BrowseAuctions;

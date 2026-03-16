@@ -15,6 +15,7 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,10 +38,31 @@ public class AuctionController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDir,
-            @RequestParam(required = false) String keyword) {
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String status) {
 
-        PagedResponse<Auction> auctions = auctionService.getActiveAuctions(page, size, sortBy, sortDir, keyword);
+        PagedResponse<Auction> auctions = auctionService.getAuctions(page, size, sortBy, sortDir, keyword, status);
         return ResponseEntity.ok(new ApiResponse<>("success", "Auctions retrieved successfully", auctions));
+    }
+
+    @GetMapping("/won/{username}")
+    public ResponseEntity<ApiResponse<List<Auction>>> getWonAuctions(@PathVariable String username) {
+        return ResponseEntity.ok(new ApiResponse<>("success", "Won auctions retrieved", auctionService.getAuctionsWonByUser(username)));
+    }
+
+    @GetMapping("/bids/all")
+    public ResponseEntity<ApiResponse<PagedResponse<Bid>>> getAllBids(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(new ApiResponse<>("success", "All bids retrieved", auctionService.getAllBids(page, size)));
+    }
+
+    @GetMapping("/stats")
+    public ResponseEntity<ApiResponse<java.util.Map<String, Long>>> getDashboardStats() {
+        java.util.Map<String, Long> stats = new java.util.HashMap<>();
+        stats.put("totalAuctions", auctionService.getTotalAuctions());
+        stats.put("totalBids", auctionService.getTotalBids());
+        return ResponseEntity.ok(new ApiResponse<>("success", "Stats retrieved", stats));
     }
 
     @GetMapping("/{id}")
@@ -56,8 +78,9 @@ public class AuctionController {
     }
 
     @PostMapping("/{id}/bid")
-    public ResponseEntity<ApiResponse<String>> placeBid(@PathVariable Long id, @Valid @RequestBody BidRequest request) {
-        auctionService.placeBid(id, request.getUsername(), request.getBidAmount());
+    public ResponseEntity<ApiResponse<String>> placeBid(@PathVariable Long id, @Valid @RequestBody BidRequest request, Authentication authentication) {
+        String username = authentication.getName();
+        auctionService.placeBid(id, username, request.getBidAmount());
         return ResponseEntity.ok(new ApiResponse<>("success", "Bid placed successfully", null));
     }
 

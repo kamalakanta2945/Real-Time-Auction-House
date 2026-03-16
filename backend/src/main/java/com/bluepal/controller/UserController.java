@@ -33,4 +33,14 @@ public class UserController {
         // Do not generate or return a token on registration; user must explicitly log in.
         return ResponseEntity.ok(new ApiResponse<>("success", "User registered successfully. Please login.", user));
     }
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<java.util.List<User>>> getAllUsers() {
+        return ResponseEntity.ok(new ApiResponse<>("success", "Users retrieved", userService.getAllUsers()));
+    }
+
+    @GetMapping("/stats")
+    public ResponseEntity<ApiResponse<Long>> getTotalUsers() {
+        return ResponseEntity.ok(new ApiResponse<>("success", "Total users retrieved", userService.getTotalUsers()));
+    }
 }

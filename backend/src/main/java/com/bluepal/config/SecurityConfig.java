@@ -26,8 +26,10 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .cors(cors -> cors.configure(http))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**", "/ws/**").permitAll()
+                .requestMatchers("/api/auth/login", "/api/auth/register", "/ws/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/auth", "/api/auth/stats").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.GET, "/api/auctions", "/api/auctions/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/auctions/bids/all", "/api/auctions/stats").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/auctions").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.PUT, "/api/auctions/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/api/auctions/**").hasRole("ADMIN")

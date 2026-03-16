@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from '../axiosConfig';
+import axios from '../../axiosConfig';
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
-import { useCountdown } from '../hooks/useCountdown';
+import { useCountdown } from '../../hooks/useCountdown';
 
 function AuctionRoom() {
   const { id } = useParams();
@@ -74,7 +74,6 @@ function AuctionRoom() {
 
     try {
       await axios.post(`/api/auctions/${id}/bid`, {
-        username: user.username,
         bidAmount: parseFloat(bidAmount)
       });
       setBidAmount('');

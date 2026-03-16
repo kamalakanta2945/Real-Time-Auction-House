@@ -12,4 +12,7 @@ import java.util.List;
 public interface AuctionRepository extends JpaRepository<Auction, Long> {
     List<Auction> findByStatus(Auction.AuctionStatus status);
     Page<Auction> findByItemNameContainingIgnoreCase(String keyword, Pageable pageable);
+    Page<Auction> findByStatusAndItemNameContainingIgnoreCase(Auction.AuctionStatus status, String keyword, Pageable pageable);
+    Page<Auction> findByStatus(Auction.AuctionStatus status, Pageable pageable);
+    List<Auction> findByWinner(String winner);
 }

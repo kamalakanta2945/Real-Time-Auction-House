@@ -10,8 +10,12 @@ import java.util.List;
 import java.util.Optional;
 
 public interface AuctionService {
-    PagedResponse<Auction> getActiveAuctions(int page, int size, String sortBy, String sortDir, String keyword);
+    PagedResponse<Auction> getAuctions(int page, int size, String sortBy, String sortDir, String keyword, String status);
     Optional<Auction> getAuctionById(Long id);
+    List<Auction> getAuctionsWonByUser(String username);
+    PagedResponse<Bid> getAllBids(int page, int size);
+    long getTotalBids();
+    long getTotalAuctions();
     List<Bid> getRecentBids(Long auctionId);
     void placeBid(Long auctionId, String username, Double bidAmount);
     Auction createAuction(AuctionRequest request);
